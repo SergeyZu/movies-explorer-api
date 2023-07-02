@@ -1,0 +1,21 @@
+{
+  "name": "movies-explorer-api",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SergeyZu/movies-explorer-api.git"
+  },
+  "keywords": [],
+  "author": "Sergey Zinchenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SergeyZu/movies-explorer-api/issues"
+  },
+  "homepage": "https://github.com/SergeyZu/movies-explorer-api#readme"
+}
