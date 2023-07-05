@@ -1,5 +1,7 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
+const MONGO_DUPLICATE_KEY_ERROR = 11000;
 
 const getCurrentUser = (req, res) => {
   User.findById(req.user._id)
@@ -50,17 +52,30 @@ const updateUser = (req, res) => {
 // };
 
 const createUser = (req, res) => {
-  User.create(req.body)
-    .then((user) => {
-      res.status(201).send(user);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: 'Internal server error',
-        err: err.message,
-        stack: err.stack,
+  const { email, password, name } = req.body;
+
+  bcrypt.hash(password, 10).then((hash) => {
+    User.create({ email, password: hash, name })
+      .then((user) => {
+        res.status(201).send({
+          email: user.email,
+          name: user.name,
+          _id: user._id,
+        });
+      })
+      .catch((err) => {
+        if (err.code === MONGO_DUPLICATE_KEY_ERROR) {
+          res.status(409).send({
+            message: 'Пользователь с таким email уже зарегистрирован',
+          });
+        }
+        res.status(500).send({
+          message: 'Internal server error',
+          err: err.message,
+          stack: err.stack,
+        });
       });
-    });
+  });
 };
 
 const loginUser = (req, res) => {
