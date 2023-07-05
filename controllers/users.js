@@ -49,24 +49,29 @@ const updateUser = (req, res) => {
 //     });
 // };
 
-// const createUser = (req, res) => {
-//   User.create(req.body)
-//     .then((user) => {
-//       res.status(201).send(user);
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         message: 'Internal server error',
-//         err: err.message,
-//         stack: err.stack,
-//       });
-//     });
-// };
+const createUser = (req, res) => {
+  User.create(req.body)
+    .then((user) => {
+      res.status(201).send(user);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal server error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
+};
+
+const loginUser = (req, res) => {
+  res.send({ message: 'OK' });
+};
 
 module.exports = {
   getCurrentUser,
   updateUser,
-  // createUser,
+  createUser,
+  loginUser,
   // getUsers,
 };
 

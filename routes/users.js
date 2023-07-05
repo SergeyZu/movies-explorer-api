@@ -7,6 +7,4 @@ router.get('/me', usersController.getCurrentUser);
 
 router.patch('/me', usersController.updateUser);
 
-// router.post('/', usersController.createUser);
-
 module.exports = router;
