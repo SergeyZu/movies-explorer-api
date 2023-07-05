@@ -1,4 +1,6 @@
 const Movie = require('../models/movie');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 const getMovies = (req, res) => {
   Movie.find({})
@@ -31,7 +33,31 @@ const createMovie = (req, res) => {
     });
 };
 
+const deleteMovie = (req, res) => {
+  console.log(req.params);
+  Movie.findById(req.params.movieId)
+    .orFail(() => {
+      throw new NotFoundError('Фильм не найден');
+    })
+    .then((movie) => {
+      if (`${movie.owner}` !== req.user._id) {
+        throw new ForbiddenError('Вы не можете удалять чужие фильмы');
+      }
+      return movie
+        .deleteOne()
+        .then(() => res.send({ message: 'Карточка удалена' }));
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal server error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
+};
+
 module.exports = {
   getMovies,
   createMovie,
+  deleteMovie,
 };

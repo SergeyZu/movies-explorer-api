@@ -1,7 +1,11 @@
 const User = require('../models/user');
+const NotFoundError = require('../errors/NotFoundError');
 
 const getCurrentUser = (req, res) => {
-  User.findById(req.params.user_id)
+  User.findById(req.user._id)
+    .orFail(() => {
+      throw new NotFoundError('Пользователь не найден');
+    })
     .then((user) => {
       res.send(user);
     })
@@ -45,24 +49,24 @@ const updateUser = (req, res) => {
 //     });
 // };
 
-const createUser = (req, res) => {
-  User.create(req.body)
-    .then((user) => {
-      res.status(201).send(user);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: 'Internal server error',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
-};
+// const createUser = (req, res) => {
+//   User.create(req.body)
+//     .then((user) => {
+//       res.status(201).send(user);
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message: 'Internal server error',
+//         err: err.message,
+//         stack: err.stack,
+//       });
+//     });
+// };
 
 module.exports = {
   getCurrentUser,
   updateUser,
-  createUser,
+  // createUser,
   // getUsers,
 };
 
