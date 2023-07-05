@@ -1,37 +1,69 @@
-const users = [];
-let id = 0;
+const User = require('../models/user');
 
 const getCurrentUser = (req, res) => {
-  const user = users.find((u) => u.id === Number(req.params.user_id));
-  if (!user) {
-    res.status(404).send({ message: 'User not found' });
-  } else {
-    res.send(user);
-  }
+  User.findById(req.params.user_id)
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal server error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
 };
 
-const getUsers = (req, res) => {
-  res.send(users);
+const updateUser = (req, res) => {
+  User.findByIdAndUpdate(req.user._id, {
+    name: req.body.name,
+    email: req.body.email,
+  })
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal server error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
 };
+
+// const getUsers = (req, res) => {
+//   User.find({})
+//     .then((users) => {
+//       res.send(users);
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message: 'Internal server error',
+//         err: err.message,
+//         stack: err.stack,
+//       });
+//     });
+// };
 
 const createUser = (req, res) => {
-  id = id + 1;
-
-  console.log(req.body);
-
-  const newUser = {
-    ...req.body,
-    id,
-  };
-  users.push(newUser);
-
-  res.send(newUser);
+  User.create(req.body)
+    .then((user) => {
+      res.status(201).send(user);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: 'Internal server error',
+        err: err.message,
+        stack: err.stack,
+      });
+    });
 };
 
 module.exports = {
   getCurrentUser,
+  updateUser,
   createUser,
-  getUsers,
+  // getUsers,
 };
 
 // const User = require('../models/user');
