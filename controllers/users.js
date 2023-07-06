@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
+// const UnauthorizedError = require('../errors/UnauthorizedError');
+
 const MONGO_DUPLICATE_KEY_ERROR = 11000;
 
 const getCurrentUser = (req, res) => {
@@ -55,6 +57,7 @@ const createUser = (req, res) => {
   const { email, password, name } = req.body;
 
   bcrypt.hash(password, 10).then((hash) => {
+    console.log('hash: ', hash);
     User.create({ email, password: hash, name })
       .then((user) => {
         res.status(201).send({
@@ -68,6 +71,7 @@ const createUser = (req, res) => {
           res.status(409).send({
             message: 'Пользователь с таким email уже зарегистрирован',
           });
+          return;
         }
         res.status(500).send({
           message: 'Internal server error',
@@ -79,7 +83,36 @@ const createUser = (req, res) => {
 };
 
 const loginUser = (req, res) => {
-  res.send({ message: 'OK' });
+  const { email, password } = req.body;
+  User.findOne({ email })
+    .select('+password')
+    .orFail(() => {
+      throw new Error('UnauthorizedError');
+    })
+    .then((user) => {
+      console.log(user);
+      return bcrypt.compare(password, user.password);
+    })
+    .then((isEqual) => {
+      console.log('isEqual: ', isEqual);
+
+      if (!isEqual) {
+        res.status(401).send({ message: 'Email или пароль неверный' });
+        return;
+      }
+      res.status(200).send({ message: 'Авторизация прошла успешно' });
+    })
+    .catch((err) => {
+      if (err.message === 'UnauthorizedError') {
+        res.status(401).send({ message: 'Email или пароль неверный' });
+      } else {
+        res.status(500).send({
+          message: 'Internal server error',
+          err: err.message,
+          stack: err.stack,
+        });
+      }
+    });
 };
 
 module.exports = {
@@ -89,12 +122,3 @@ module.exports = {
   loginUser,
   // getUsers,
 };
-
-// const User = require('../models/user');
-
-// const getCurrentUser = (req, res, next) => {
-//   User.findById(req.params.user_id).then((user) => {
-//     res.send(user);
-//   })
-//   .catch(next)
-// }
