@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
+
 const router = require('./routes');
 // const { checkToken } = require('./utils/jwtAuth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -17,6 +19,8 @@ app.use(requestLogger);
 app.use(router);
 
 app.use(errorLogger);
+
+app.use(errors());
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
