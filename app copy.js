@@ -1,12 +1,12 @@
-const express = require('express');
-const mongoose = require('mongoose');
+// const express = require('express');
+// const mongoose = require('mongoose');
 
-const app = express();
+// const app = express();
 
 const { PORT = 3000 } = process.env;
 
-mongoose
-  .connect('mongodb://127.0.0.1:27017/filmsdb')
+// mongoose
+//   .connect('mongodb://127.0.0.1:27017/filmsdb')
   .then(() => {
     console.log('Успешное подключение к базе данных');
     app.listen(PORT, () => {
@@ -17,27 +17,27 @@ mongoose
     console.log(`Ошибка подключения к базе данных ${err.name}`);
   });
 
-const users = [];
-let id = 0;
+// const users = [];
+// let id = 0;
 
-app.use(express.json());
+// app.use(express.json());
 
 //  возвращает информацию о пользователе (email и имя)
 // app.get('/users/me', getCurrentUser);
-app.get('/users/me', (req, res) => {
-  const user = users.find((u) => u.id === Number(req.params.user_id));
-  res.send(user);
-});
+// app.get('/users/me', (req, res) => {
+//   const user = users.find((u) => u.id === Number(req.params.user_id));
+//   res.send(user);
+// });
 
-app.post('/users', (req, res) => {
-  id += 1;
+// app.post('/users', (req, res) => {
+//   id += 1;
 
-  const newUser = {
-    ...req.body,
-    id,
-  };
-  users.push(newUser);
-});
+//   const newUser = {
+//     ...req.body,
+//     id,
+//   };
+//   users.push(newUser);
+// });
 
 // обновляет информацию о пользователе (email и имя)
 // app.patch('/users/me', updateUser);

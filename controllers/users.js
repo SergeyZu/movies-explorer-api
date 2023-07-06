@@ -1,11 +1,11 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const { signToken } = require('../utils/jwtAuth');
+// const signToken = require('../utils/jwtAuth').signToken;
 const NotFoundError = require('../errors/NotFoundError');
 // const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const MONGO_DUPLICATE_KEY_ERROR = 11000;
-const SECRET_KEY = '$ecret_key';
 
 const getCurrentUser = (req, res) => {
   User.findById(req.user._id)
@@ -99,8 +99,7 @@ const loginUser = (req, res) => {
         res.status(401).send({ message: 'Email или пароль неверный' });
         return;
       }
-      const token = jwt.sign({ _id: user._id }, SECRET_KEY);
-
+      const token = signToken({ _id: user._id });
       res.status(200).send({ token });
     })
     .catch((err) => {
