@@ -1,9 +1,11 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 // const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const MONGO_DUPLICATE_KEY_ERROR = 11000;
+const SECRET_KEY = '$ecret_key';
 
 const getCurrentUser = (req, res) => {
   User.findById(req.user._id)
@@ -90,17 +92,16 @@ const loginUser = (req, res) => {
       throw new Error('UnauthorizedError');
     })
     .then((user) => {
-      console.log(user);
-      return bcrypt.compare(password, user.password);
+      return Promise.all([user, bcrypt.compare(password, user.password)]);
     })
-    .then((isEqual) => {
-      console.log('isEqual: ', isEqual);
-
+    .then(([user, isEqual]) => {
       if (!isEqual) {
         res.status(401).send({ message: 'Email или пароль неверный' });
         return;
       }
-      res.status(200).send({ message: 'Авторизация прошла успешно' });
+      const token = jwt.sign({ _id: user._id }, SECRET_KEY);
+
+      res.status(200).send({ token });
     })
     .catch((err) => {
       if (err.message === 'UnauthorizedError') {
