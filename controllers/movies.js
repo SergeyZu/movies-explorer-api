@@ -34,12 +34,12 @@ const deleteMovieCard = (req, res, next) => {
       throw new NotFoundError('Фильм не найден');
     })
     .then((movie) => {
-      if (movie.owner.toString() === req.user._id) {
+      if (movie.owner.toString() === req.user._id.toString()) {
+        movie.deleteOne();
+        res.send({ message: 'Фильм удален' });
+      } else {
         throw new ForbiddenError('Вы не можете удалять чужие фильмы');
       }
-      return movie
-        .deleteOne()
-        .then(() => res.send({ message: 'Фильм удален' }));
     })
     .catch(next);
 };
