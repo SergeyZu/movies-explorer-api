@@ -7,12 +7,12 @@ const {
 
 router.get('/', moviesController.getMovies);
 
-router.post('/', validateCreateMovie, moviesController.createMovie);
+router.post('/', validateCreateMovie, moviesController.createMovieCard);
 
 router.delete(
   '/:cardId',
   validateMovieCardId,
-  moviesController.deleteMovieCard
+  moviesController.deleteMovieCard,
 );
 
 module.exports = router;

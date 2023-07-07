@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
 const { checkToken } = require('../utils/jwtAuth');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const auth = (req, res, next) => {
-  if (!req.headers.authorization) {
-    return res.status(401).send({ message: 'Пользователь не авторизован' });
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return next(new UnauthorizedError('Пользователь не авторизован'));
   }
-  const token = req.headers.authorization.replace('Bearer ', '');
+
+  const token = authorization.replace('Bearer ', '');
 
   try {
     const payload = checkToken(token);
@@ -13,9 +17,9 @@ const auth = (req, res, next) => {
       _id: new mongoose.Types.ObjectId(payload._id),
     };
     // req.user = payload;
-    next();
+    return next();
   } catch (err) {
-    return res.status(401).send({ message: 'Пользователь не авторизован' });
+    return next(new UnauthorizedError('Пользователь не авторизован'));
   }
 };
 
