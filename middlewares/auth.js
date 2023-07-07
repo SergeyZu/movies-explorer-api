@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const { checkToken } = require('../utils/jwtAuth');
 
 const auth = (req, res, next) => {
-  console.log(req.headers);
   if (!req.headers.authorization) {
     return res.status(401).send({ message: 'Пользователь не авторизован' });
   }
