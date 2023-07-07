@@ -41,20 +41,6 @@ const updateUser = (req, res) => {
     });
 };
 
-// const getUsers = (req, res) => {
-//   User.find({})
-//     .then((users) => {
-//       res.send(users);
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         message: 'Internal server error',
-//         err: err.message,
-//         stack: err.stack,
-//       });
-//     });
-// };
-
 const createUser = (req, res) => {
   const { email, password, name } = req.body;
 
@@ -99,7 +85,7 @@ const loginUser = (req, res) => {
         res.status(401).send({ message: 'Email или пароль неверный' });
         return;
       }
-      const token = signToken({ _id: user._id });
+      const token = signToken({ _id: user._id }, { expiresIn: '7d' });
       res.status(200).send({ token });
     })
     .catch((err) => {

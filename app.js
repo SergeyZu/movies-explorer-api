@@ -2,13 +2,26 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 
+const { errorHandler } = require('./middlewares/errorHandler');
 const router = require('./routes');
 // const { checkToken } = require('./utils/jwtAuth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-mongoose.connect('mongodb://127.0.0.1:27017/filmsdb');
+const { PORT = 3000 } = process.env;
 
 const app = express();
+
+mongoose
+  .connect('mongodb://127.0.0.1:27017/filmsdb')
+  .then(() => {
+    console.log('Успешное подключение к базе данных');
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(`Ошибка подключения к базе данных ${err.name}`);
+  });
 
 app.use(express.json());
 
@@ -22,6 +35,4 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-});
+app.use(errorHandler);
