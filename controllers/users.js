@@ -77,11 +77,8 @@ const loginUser = (req, res) => {
     .orFail(() => {
       throw new Error('UnauthorizedError');
     })
-    .then(
-      (user) =>
-        // eslint-disable-next-line implicit-arrow-linebreak
-        Promise.all([user, bcrypt.compare(password, user.password)]),
-      // eslint-disable-next-line function-paren-newline
+    .then((user) =>
+      Promise.all([user, bcrypt.compare(password, user.password)]),
     )
     .then(([user, isEqual]) => {
       if (!isEqual) {
