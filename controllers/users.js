@@ -5,7 +5,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 
-// const { NODE_ENV, SECRET_KEY } = process.env;
+const { NODE_ENV, SECRET_KEY } = process.env;
 
 // const UnauthorizedError = require('../errors/UnauthorizedError');
 
@@ -70,35 +70,21 @@ const createUser = (req, res, next) => {
   });
 };
 
-const loginUser = (req, res) => {
+const loginUser = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email })
-    .select('+password')
-    .orFail(() => {
-      throw new Error('UnauthorizedError');
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = signToken(
+        { _id: user._id },
+        NODE_ENV === 'production' ? SECRET_KEY : 'dev-secret',
+        {
+          expiresIn: '7d',
+        },
+      );
+      res.send({ token });
     })
-    .then((user) =>
-      Promise.all([user, bcrypt.compare(password, user.password)]),
-    )
-    .then(([user, isEqual]) => {
-      if (!isEqual) {
-        res.status(401).send({ message: 'Email или пароль неверный' });
-        return;
-      }
-      const token = signToken({ _id: user._id }, { expiresIn: '7d' });
-      res.status(200).send({ token });
-    })
-    .catch((err) => {
-      if (err.message === 'UnauthorizedError') {
-        res.status(401).send({ message: 'Email или пароль неверный' });
-      } else {
-        res.status(500).send({
-          message: 'Internal server error',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
-    });
+    .catch(next);
 };
 
 module.exports = {
@@ -106,5 +92,4 @@ module.exports = {
   updateUser,
   createUser,
   loginUser,
-  // getUsers,
 };
