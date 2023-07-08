@@ -1,7 +1,10 @@
-# movies-explorer-api
+# Дипломная работа - backend
 
-api.zinchenko.nomoredomains.work
+В рамках дипломной работы реализован проект **movies-explorer**
+В первой части работы создана серверная часть.
 
-https://github.com/SergeyZu/movies-explorer-api
+### Ссылки
 
-158.160.5.160
+Репозиторий: https://github.com/SergeyZu/movies-explorer-api
+Домен сервера: https://api.zinchenko.nomoredomains.work
+IP: 158.160.5.160
