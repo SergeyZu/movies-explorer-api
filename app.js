@@ -1,18 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
+const helmet = require('helmet');
+const cors = require('cors');
 
 const { errorHandler } = require('./middlewares/errorHandler');
 const router = require('./routes');
 // const { checkToken } = require('./utils/jwtAuth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const limiter = require('./utils/limiter');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, NODE_ENV, DB_URL } = process.env;
 
 const app = express();
 
+app.use(cors());
+
+app.use(helmet());
+
 mongoose
-  .connect('mongodb://127.0.0.1:27017/bitfilmsdb')
+  .connect(
+    NODE_ENV === 'production' ? DB_URL : 'mongodb://127.0.0.1:27017/bitfilmsdb',
+  )
   .then(() => {
     console.log('Успешное подключение к базе данных');
     app.listen(PORT, () => {
@@ -27,7 +36,7 @@ app.use(express.json());
 
 app.use(requestLogger);
 
-// app.use();
+app.use(limiter);
 
 app.use(router);
 

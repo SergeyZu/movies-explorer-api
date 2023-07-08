@@ -21,7 +21,6 @@ const auth = (req, res, next) => {
     req.user = {
       _id: new mongoose.Types.ObjectId(payload._id),
     };
-    // req.user = payload;
     return next();
   } catch (err) {
     return next(new UnauthorizedError('Пользователь не авторизован'));
